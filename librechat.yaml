@@ -36,7 +36,7 @@ endpoints:
       titleConvo: true
       titleModel: "gpt-4o-mini"
 
-    # OpenRouter Example
+# OpenRouter Example
     - name: 'OpenRouter'
       # For `apiKey` and `baseURL`, you can use environment variables that you define.
       # recommended environment variables:
