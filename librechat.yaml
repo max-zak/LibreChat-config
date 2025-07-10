@@ -1,0 +1,18 @@
+version: 1
+cache: true
+
+endpoints:
+  custom:
+    - name: "GitHub"
+      apiKey: "user_provided"
+      baseURL: "https://models.inference.ai.azure.com"
+      models:
+        default: [
+          "gpt-4o",
+          "gpt-4o-mini", 
+          "Meta-Llama-3.1-70B-Instruct",
+          "Meta-Llama-3.1-405B-Instruct"
+        ]
+        fetch: true
+      titleConvo: true
+      modelDisplayLabel: "GitHub Models"
