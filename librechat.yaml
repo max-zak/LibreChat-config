@@ -17,21 +17,21 @@ endpoints:
       baseURL: "https://models.github.ai/inference"
       models:
         default:
-          - openai/gpt-4.1
-          - openai/gpt-4.1-mini
-          - Meta-Llama-3-70B-Instruct
-          - Meta-Llama-3-8B-Instruct
-          - Meta-Llama-3.1-405B-Instruct
-          - Meta-Llama-3.1-70B-Instruct
-          - Meta-Llama-3.1-8B-Instruct
-          - Mistral-Nemo
-          - Mistral-large-2407
-          - Mistral-small
+          - gpt-4.1
+          - gpt-4.1-mini
+          - gpt-4.1-nano
           - gpt-4o
           - gpt-4o-mini
-
-          - text-embedding-3-large
-          - text-embedding-3-small
+          - o4-mini
+          - DeepSeek-R1-0528
+          - Llama-4-Maverick-17B-128E-Instruct-FP8
+          - Llama-4-Scout-17B-16E-Instruct
+          - Llama-3.3-70B-Instruct
+          - grok-3
+          - Mistral-Nemo
+          - Mistral-large-2411
+          - mistral-medium-2505
+          - mistral-small-2503
         fetch: false
       titleConvo: true
       titleModel: "gpt-4o-mini"
