@@ -1,0 +1,163 @@
+services:
+  librechat:
+    image: 'ghcr.io/danny-avila/librechat-dev-api:latest'
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+      vectordb:
+        condition: service_healthy
+      rag_api:
+        condition: service_started
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3080
+      - SERVICE_FQDN_LIBRECHAT_3080
+      - NODE_ENV=production
+      - 'MONGO_URI=mongodb://${SERVICE_USER_MONGO}:${SERVICE_PASSWORD_MONGO}@mongodb:27017/librechat?authSource=admin'
+      - 'MEILI_HOST=http://meilisearch:7700'
+      - MEILI_NO_ANALYTICS=true
+      - 'MEILI_MASTER_KEY=${SERVICE_PASSWORD_MEILI}'
+      - 'ENABLE_MEILISEARCH=${ENABLE_MEILISEARCH:-true}'
+      - 'RAG_API_HOST=http://rag_api:8000'
+      - RAG_PORT=8000
+      - 'ENABLE_RAG=${ENABLE_RAG:-true}'
+      - 'JWT_SECRET=${SERVICE_PASSWORD_JWT}'
+      - 'JWT_REFRESH_SECRET=${SERVICE_PASSWORD_64_JWT}'
+      - 'DOMAIN_CLIENT=${SERVICE_FQDN_LIBRECHAT}'
+      - 'DOMAIN_SERVER=${SERVICE_FQDN_LIBRECHAT}'
+      - 'ALLOW_EMAIL_LOGIN=${ALLOW_EMAIL_LOGIN:-true}'
+      - 'APP_TITLE=${APP_TITLE:-LibreChat}'
+      - 'ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-true}'
+      - 'ALLOW_NO_APIKEY=${ALLOW_NO_APIKEY:-true}'
+      - 'ALLOW_UNVERIFIED_EMAIL_LOGIN=${ALLOW_UNVERIFIED_EMAIL_LOGIN:-true}'
+      - 'ALLOW_PASSWORD_RESET=${ALLOW_PASSWORD_RESET:-false}'
+      - 'CREDS_KEY=${SERVICE_PASSWORD_64_CREDS}'
+      - 'CREDS_IV=${SERVICE_PASSWORD_CREDS}'
+      - 'OPENAI_API_KEY=${SERVICE_OPENAI_API_KEY:-user_provided}'
+      - 'ANTHROPIC_API_KEY=${SERVICE_ANTHROPIC_API_KEY:-user_provided}'
+      - 'GOOGLE_KEY=${SERVICE_GOOGLE_API_KEY:-user_provided}'
+      - 'BINGAI_TOKEN=${SERVICE_BINGAI_TOKEN:-user_provided}'
+      - 'ASSISTANTS_API_KEY=${SERVICE_ASSISTANTS_API_KEY:-user_provided}'
+      - 'MISTRAL_API_KEY=${SERVICE_MISTRAL_API_KEY:-user_provided}'
+      - 'GROQ_API_KEY=${SERVICE_GROQ_API_KEY:-user_provided}'
+      - 'PERPLEXITY_API_KEY=${SERVICE_PERPLEXITY_API_KEY:-user_provided}'
+      - 'ANYSCALE_API_KEY=${SERVICE_ANYSCALE_API_KEY:-user_provided}'
+      - 'TOGETHERAI_API_KEY=${SERVICE_TOGETHERAI_API_KEY:-user_provided}'
+      - 'DEEPSEEK_API_KEY=${SERVICE_DEEPSEEK_API_KEY:-user_provided}'
+      - 'DEBUG_LOGGING=${DEBUG_LOGGING:-true}'
+      - 'NO_INDEX=${NO_INDEX:-true}'
+      
+      - 'ENDPOINTS=${ENDPOINTS:-openAI,azureOpenAI,google,anthropic}'
+      - 'OPENROUTER_KEY=${OPENROUTER_KEY:-user_provided}'
+      
+      - CONFIG_PATH=https://raw.githubusercontent.com/max-zak/LibreChat-config/main/librechat.yaml
+
+    volumes:
+      - 'librechat-images:/app/client/public/images'
+      - 'librechat-uploads:/app/uploads'
+      - 'librechat-logs:/app/api/logs'
+      - 'librechat-config:/app/custom/config'
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '--no-verbose'
+        - '--tries=1'
+        - '--spider'
+        - 'http://127.0.0.1:3080/api/health'
+      interval: 5s
+      timeout: 10s
+      retries: 3
+  mongodb:
+    image: 'mongo:6-jammy'
+    environment:
+      - 'MONGO_INITDB_ROOT_USERNAME=${SERVICE_USER_MONGO}'
+      - 'MONGO_INITDB_ROOT_PASSWORD=${SERVICE_PASSWORD_MONGO}'
+      - 'ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}'
+    volumes:
+      - 'mongodb-data:/data/db'
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - '--eval'
+        - "db.runCommand('ping').ok"
+        - '127.0.0.1:27017/test'
+        - '--quiet'
+      interval: 5s
+      timeout: 10s
+      retries: 3
+  meilisearch:
+    image: 'getmeili/meilisearch:latest'
+    environment:
+      - 'MEILI_MASTER_KEY=${SERVICE_PASSWORD_MEILI}'
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_ENV=production
+    volumes:
+      - 'meilisearch-data:/meili_data'
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://127.0.0.1:7700/health'
+      interval: 2s
+      timeout: 10s
+      retries: 15
+  rag_api:
+    image: 'ghcr.io/danny-avila/librechat-rag-api-dev-lite:latest'
+    environment:
+      - POSTGRES_DB=rag
+      - 'POSTGRES_USER=${SERVICE_USER_POSTGRES}'
+      - 'POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}'
+      - DB_HOST=vectordb
+      - 'DB_USER=${SERVICE_USER_POSTGRES}'
+      - 'DB_PASSWORD=${SERVICE_PASSWORD_POSTGRES}'
+      - DB_NAME=rag
+      - RAG_PORT=8000
+      - 'RAG_OPENAI_API_KEY=${SERVICE_OPENAI_API_KEY:-user_provided}'
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '--no-verbose'
+        - '--tries=1'
+        - '--spider'
+        - 'http://127.0.0.1:8000/health'
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    depends_on:
+      vectordb:
+        condition: service_healthy
+  vectordb:
+    image: 'ankane/pgvector:latest'
+    environment:
+      - POSTGRES_DB=rag
+      - 'POSTGRES_USER=${SERVICE_USER_POSTGRES}'
+      - 'POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}'
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - 'vectordb-data:/var/lib/postgresql/data'
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - '--username=$SERVICE_USER_POSTGRES'
+        - '--host=127.0.0.1'
+        - '--port=5432'
+        - '--dbname=rag'
+      interval: 2s
+      timeout: 1m
+      retries: 5
+      start_period: 10s
+volumes:
+  mongodb-data: null
+  meilisearch-data: null
+  vectordb-data: null
+  librechat-images: null
+  librechat-logs: null
+  librechat-uploads: null
+  librechat-config: null
