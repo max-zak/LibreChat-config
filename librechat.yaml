@@ -3,16 +3,38 @@ cache: true
 
 endpoints:
   custom:
-    - name: "GitHub"
+# GitHub 
+    # Models: https://models.inference.ai.azure.com/models
+    - name: "Github Models"
+      iconURL: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
       apiKey: "user_provided"
       baseURL: "https://models.inference.ai.azure.com"
       models:
-        default: [
-          "gpt-4o",
-          "gpt-4o-mini", 
-          "Meta-Llama-3.1-70B-Instruct",
-          "Meta-Llama-3.1-405B-Instruct"
-        ]
-        fetch: true
+        default:
+          - AI21-Jamba-Instruct
+          - Cohere-command-r
+          - Cohere-command-r-plus
+          - Cohere-embed-v3-english
+          - Cohere-embed-v3-multilingual
+          - Meta-Llama-3-70B-Instruct
+          - Meta-Llama-3-8B-Instruct
+          - Meta-Llama-3.1-405B-Instruct
+          - Meta-Llama-3.1-70B-Instruct
+          - Meta-Llama-3.1-8B-Instruct
+          - Mistral-Nemo
+          - Mistral-large-2407
+          - Mistral-small
+          - Phi-3-medium-128k-instruct
+          - Phi-3-medium-4k-instruct
+          - Phi-3-mini-128k-instruct
+          - Phi-3-mini-4k-instruct
+          - Phi-3-small-128k-instruct
+          - Phi-3-small-8k-instruct
+          - Phi-3.5-mini-instruct
+          - gpt-4o
+          - gpt-4o-mini
+          - text-embedding-3-large
+          - text-embedding-3-small
+        fetch: false
       titleConvo: true
-      modelDisplayLabel: "GitHub Models"
+      titleModel: "gpt-4o-mini"
