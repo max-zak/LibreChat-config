@@ -22,7 +22,6 @@ endpoints:
           - gpt-4.1-nano
           - gpt-4o
           - gpt-4o-mini
-          - o4-mini
           - DeepSeek-R1-0528
           - Llama-4-Maverick-17B-128E-Instruct-FP8
           - Llama-4-Scout-17B-16E-Instruct
