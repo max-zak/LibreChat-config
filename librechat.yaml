@@ -7,15 +7,12 @@ endpoints:
     # Models: https://models.inference.ai.azure.com/models
     - name: "Github Models"
       iconURL: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
-      apiKey: "user_provided"
-      baseURL: "https://models.inference.ai.azure.com"
+      apiKey:  '${GITHUB_TOKEN}'
+      baseURL: "https://models.github.ai/inference"
       models:
         default:
-          - AI21-Jamba-Instruct
-          - Cohere-command-r
-          - Cohere-command-r-plus
-          - Cohere-embed-v3-english
-          - Cohere-embed-v3-multilingual
+          - openai/gpt-4.1
+          - openai/gpt-4.1-mini
           - Meta-Llama-3-70B-Instruct
           - Meta-Llama-3-8B-Instruct
           - Meta-Llama-3.1-405B-Instruct
@@ -24,15 +21,9 @@ endpoints:
           - Mistral-Nemo
           - Mistral-large-2407
           - Mistral-small
-          - Phi-3-medium-128k-instruct
-          - Phi-3-medium-4k-instruct
-          - Phi-3-mini-128k-instruct
-          - Phi-3-mini-4k-instruct
-          - Phi-3-small-128k-instruct
-          - Phi-3-small-8k-instruct
-          - Phi-3.5-mini-instruct
-          - gpt-4o
-          - gpt-4o-mini
+          - openai/gpt-4o
+          - openai/gpt-4o-mini
+
           - text-embedding-3-large
           - text-embedding-3-small
         fetch: false
